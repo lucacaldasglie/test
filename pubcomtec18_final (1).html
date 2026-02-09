@@ -1,0 +1,2408 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#0b0c10" id="metaThemeColor" />
+  <title>PubComTec — IA na Publicidade e Propaganda</title>
+  <meta name="description" content="PubComTec — UFRJ/ECO - UdG. Pesquisa sobre IA generativa na prática publicitária, ética e formação." />
+
+  <style>
+    :root{
+      --bg-0:#07080b; --bg-1:#0b0c10; --bg-2:#10121a;
+      --panel:rgba(255,255,255,.04); --panel-2:rgba(255,255,255,.06);
+      --stroke:rgba(255,255,255,.09); --stroke-2:rgba(255,255,255,.14);
+      --text:rgba(255,255,255,.92); --muted:rgba(255,255,255,.70); --muted-2:rgba(255,255,255,.55);
+      --shadow:0 14px 40px rgba(0,0,0,.55); --shadow-soft:0 10px 24px rgba(0,0,0,.35);
+      --radius:18px; --radius-lg:26px; --container:1120px;
+
+      /* Acentos */
+      --a1:rgba(166,99,255,.95);  /* roxo */
+      --a2:rgba(255,110,199,.90); /* rosa */
+      --a3:rgba(92,214,255,.88);  /* azul */
+
+      --ease:cubic-bezier(.2,.8,.2,1);
+      --ease-out:cubic-bezier(.16,1,.3,1);
+
+      --h1:clamp(1.9rem, 2.6vw + 1rem, 3.15rem);
+      --h2:clamp(1.35rem, 1.35vw + 1rem, 2.1rem);
+      --h3:clamp(1.05rem, .8vw + .85rem, 1.4rem);
+      --p: clamp(1rem, .25vw + .95rem, 1.08rem);
+      --small:clamp(.88rem, .2vw + .84rem, .98rem);
+
+      /* Cursor spotlight global */
+      --mx: 50%;
+      --my: 20%;
+    }
+
+    *{box-sizing:border-box;}
+    html,body{height:100%;}
+    html{ scroll-behavior:smooth; scroll-padding-top: calc(var(--header-h, 72px) + 12px); }
+    body{
+      margin:0;
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(166,99,255,.10), transparent 55%),
+        radial-gradient(900px 520px at 90% 20%, rgba(255,110,199,.09), transparent 58%),
+        radial-gradient(900px 520px at 70% 90%, rgba(92,214,255,.08), transparent 58%),
+        linear-gradient(180deg, var(--bg-0), var(--bg-1) 40%, var(--bg-2));
+      overflow-x:hidden;
+    }
+    a{color:inherit; text-decoration:none;}
+    button{font-family:inherit;}
+
+    /* Acessibilidade: skip link */
+    .skip-link{
+      position:absolute; left:-999px; top:auto; width:1px; height:1px; overflow:hidden;
+    }
+    .skip-link:focus{
+      left:14px; top:14px; width:auto; height:auto;
+      padding:10px 12px;
+      background:rgba(0,0,0,.75);
+      border:1px solid var(--stroke-2);
+      border-radius:12px;
+      z-index:9999;
+      outline:none;
+    }
+
+    .container{ width:min(var(--container), calc(100% - 40px)); margin-inline:auto; }
+
+    /* Fundo “mágico” suave */
+    .bg-magic{
+      pointer-events:none;
+      position:fixed; inset:-20vh -20vw;
+      z-index:-2;
+      opacity:.65;
+      background:
+        radial-gradient(closest-side at 20% 25%, rgba(166,99,255,.12), transparent 62%),
+        radial-gradient(closest-side at 85% 30%, rgba(255,110,199,.10), transparent 62%),
+        radial-gradient(closest-side at 65% 85%, rgba(92,214,255,.10), transparent 62%);
+      transform: translate3d(0,0,0);
+      animation: drift 14s var(--ease-out) infinite alternate;
+      will-change: transform, opacity;
+    }
+    @keyframes drift{
+      from{ transform: translate3d(-1.5%, -1.0%, 0) scale(1.02); opacity:.58; }
+      to  { transform: translate3d( 1.5%,  1.0%, 0) scale(1.03); opacity:.70; }
+    }
+
+    /* Spotlight global seguindo o mouse */
+    .cursor-spotlight{
+      position:fixed; inset:0;
+      pointer-events:none;
+      z-index:-1;
+      opacity:0;
+      transition: opacity .35s var(--ease);
+      background:
+        radial-gradient(520px 520px at var(--mx) var(--my),
+          rgba(92,214,255,.12),
+          rgba(166,99,255,.10) 28%,
+          rgba(255,110,199,.06) 52%,
+          transparent 70%);
+      mix-blend-mode: screen;
+    }
+    .cursor-spotlight.on{ opacity:.85; }
+
+    /* Preferências de movimento */
+    @media (prefers-reduced-motion: reduce){
+      html{ scroll-behavior:auto !important; }
+      .bg-magic{ animation:none !important; }
+      .cursor-spotlight{ display:none !important; }
+      *{ transition:none !important; animation:none !important; }
+    }
+    @media (hover:none){
+      .cursor-spotlight{ display:none; }
+    }
+
+    /* Topbar */
+    header.site-top{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(7,8,11,.72), rgba(7,8,11,.36));
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:14px 0;
+      flex-wrap:wrap;
+    }
+    .brand{display:flex; align-items:center; gap:12px; min-width:0;}
+
+    .brand-logo{
+      height:54px;
+      width:auto;
+      max-width:240px;
+      display:block;
+      object-fit:contain;
+      border-radius:10px;
+      padding:2px 6px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 10px 28px rgba(0,0,0,.20);
+    }
+    :root[data-theme="light"] .brand-logo{
+      filter: invert(1);
+      background: rgba(0,0,0,.03);
+      border-color: rgba(0,0,0,.10);
+      box-shadow: 0 10px 28px rgba(0,0,0,.08);
+    }
+    .logo{
+      width:38px; height:38px; border-radius:14px;
+      background:
+        radial-gradient(closest-side at 30% 30%, rgba(255,255,255,.18), transparent 60%),
+        linear-gradient(135deg, rgba(166,99,255,.85), rgba(255,110,199,.7), rgba(92,214,255,.7));
+      box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.12);
+      position:relative; overflow:hidden;
+    }
+    .logo::after{
+      content:""; position:absolute; inset:-60%;
+      background: radial-gradient(circle at 50% 50%, rgba(255,255,255,.10), transparent 50%);
+      transform: rotate(20deg); opacity:.9;
+    }
+    .brand-text{display:flex; flex-direction:column; line-height:1.15; min-width:0;}
+    .brand-text strong{
+      font-size:1.45rem;
+      letter-spacing:.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .brand-text span{
+      font-size:.92rem; color:var(--muted-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+
+    nav.quick{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center; min-width:0; flex:1 1 420px;}
+
+    .top-actions{ display:flex; align-items:center; gap:10px; flex-shrink:0; }
+
+        .aux-actions{ display:flex; align-items:center; gap:12px; margin-right:2px; }
+    .aux-link{
+      display:inline-flex;
+      align-items:center;
+      font-size:.92rem;
+      font-weight:650;
+      color:var(--muted);
+      text-decoration:none;
+      padding:6px 6px;
+      border-radius:12px;
+      transition: color .25s var(--ease), background .25s var(--ease), transform .12s var(--ease);
+      white-space:nowrap;
+      outline:none;
+    }
+    .aux-link:hover{
+      color:var(--text);
+      background: rgba(255,255,255,.05);
+      transform: translateY(-1px);
+    }
+    .aux-link:active{ transform: scale(.98); }
+    .aux-link:focus-visible{ outline:2px solid rgba(92,214,255,.45); outline-offset:2px; }
+
+
+
+    .action-link{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      height:44px;
+      padding:0 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.92);
+      font-weight:720;
+      letter-spacing:.12px;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .12s var(--ease), box-shadow .25s var(--ease), background .25s var(--ease), border-color .25s var(--ease), filter .25s var(--ease);
+      outline:none;
+      box-shadow: 0 10px 20px rgba(0,0,0,.22);
+      white-space:nowrap;
+      position:relative;
+      overflow:hidden;
+    }
+    .action-link:hover{
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 12px 24px rgba(0,0,0,.28);
+      filter: brightness(1.03);
+    }
+    .action-link:active{ transform: scale(.985); transition-duration: .08s; }
+    .action-link:focus-visible{ outline:2px solid rgba(92,214,255,.45); outline-offset:2px; }
+    .action-link.cta{
+      border-color: rgba(255,255,255,.14);
+      background: linear-gradient(135deg, rgba(166,99,255,.30), rgba(255,110,199,.22), rgba(92,214,255,.22));
+    }
+    .action-link.cta::after{
+      content:""; position:absolute; inset:-60%;
+      background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.18), transparent 55%);
+      transform: rotate(20deg); opacity:.6; pointer-events:none;
+    }
+    .flag{ font-size:1.05em; line-height:1; margin-left:4px; }
+
+    @media (min-width: 900px){
+      .top-actions .action-link{ display:inline-flex; }
+      nav.quick .chip-link.nav-secondary{ display:none; }
+    }
+    @media (max-width: 899px){
+      nav.quick{ flex-wrap:wrap; }
+      .top-actions .action-link{ display:none; }
+      nav.quick .chip-link.nav-secondary{ display:inline-flex; }
+    }
+
+.menu-btn{
+      display:none;
+      width:44px; height:44px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.92);
+      cursor:pointer;
+      transition: transform .12s var(--ease), background .25s var(--ease), border-color .25s var(--ease);
+      outline:none;
+    }
+    .menu-btn:hover{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.16); transform: translateY(-1px); }
+    .menu-btn:active{ transform: scale(.98); }
+    .menu-btn:focus-visible{ outline:2px solid rgba(92,214,255,.45); outline-offset:2px; }
+    .menu-icon{ font-size:1.05rem; line-height:1; }
+
+    .nav-backdrop{
+      position: fixed;
+      inset: 0;
+      z-index: 65;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s var(--ease);
+    }
+    body.menu-open .nav-backdrop{ opacity: 1; pointer-events:auto; }
+
+
+    .chip-link{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      font-size:.92rem;
+      font-weight:650;
+      color:var(--muted);
+      padding:9px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      transition: background .25s var(--ease), border-color .25s var(--ease), color .25s var(--ease), transform .12s var(--ease), box-shadow .25s var(--ease);
+      outline:none;
+      white-space:nowrap;
+      cursor:pointer;
+    }
+    .chip-link:hover{
+      background: rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.18);
+      color: var(--text);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(0,0,0,.22);
+    }
+    .chip-link:active{ transform: scale(.985); }
+    .chip-link:focus-visible{ outline:2px solid rgba(92,214,255,.45); outline-offset:2px; }
+    .chip-link.is-active,
+    .chip-link[aria-current="page"]{
+      color: var(--text);
+      border-color: rgba(255,255,255,.22);
+      background: linear-gradient(135deg, rgba(166,99,255,.26), rgba(255,110,199,.18), rgba(92,214,255,.18));
+      box-shadow: 0 14px 30px rgba(0,0,0,.28);
+    }
+
+    .lang-toggle{
+      display:flex; align-items:center; gap:6px;
+      padding:6px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.09);
+      background: rgba(255,255,255,.03);
+      box-shadow: 0 10px 20px rgba(0,0,0,.25);
+    }
+    .lang-btn{
+      appearance:none; border:0; background:transparent;
+      color:var(--muted);
+      padding:8px 10px; border-radius:999px;
+      font-weight:650; letter-spacing:.2px;
+      cursor:pointer; min-width:64px;
+      transition: transform .12s var(--ease), background .25s var(--ease), color .25s var(--ease);
+      outline:none;
+    }
+    .lang-btn:hover{ color:var(--text); background: rgba(255,255,255,.04); }
+    .lang-btn:active{ transform: scale(.97); }
+    .lang-btn[aria-pressed="true"]{
+      color: rgba(255,255,255,.92);
+      background: linear-gradient(135deg, rgba(166,99,255,.22), rgba(255,110,199,.18), rgba(92,214,255,.18));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.10);
+    }
+    .lang-btn:focus-visible{ outline:2px solid rgba(166,99,255,.45); outline-offset:2px; }
+
+    /* Títulos com gradiente tecnológico */
+    h1[data-i18n], h2[data-i18n]{
+      background: linear-gradient(90deg,
+        rgba(92,214,255,.98),
+        rgba(166,99,255,.98),
+        rgba(255,110,199,.82)
+      );
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      text-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    h3[data-i18n]{
+      background: linear-gradient(90deg,
+        rgba(255,255,255,.92),
+        rgba(166,99,255,.82),
+        rgba(92,214,255,.78)
+      );
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    /* Hero */
+    .hero{ padding: clamp(26px, 4vw, 48px) 0 8px; }
+    .hero-grid{ display:grid; gap:22px; grid-template-columns: 1fr; align-items:start; }
+    .hero-card{
+      border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.09);
+      box-shadow: var(--shadow);
+      position:relative; overflow:hidden;
+      --hx: 50%;
+      --hy: 50%;
+    }
+    .hero-card::before{
+      content:""; position:absolute; inset:-2px;
+      background:
+        radial-gradient(700px 220px at 15% 20%, rgba(166,99,255,.20), transparent 55%),
+        radial-gradient(700px 220px at 85% 15%, rgba(255,110,199,.16), transparent 55%),
+        radial-gradient(700px 220px at 65% 105%, rgba(92,214,255,.15), transparent 55%);
+      opacity:.55; pointer-events:none;
+    }
+    .hero-card::after{
+      content:"";
+      position:absolute; inset:-2px;
+      pointer-events:none;
+      opacity:0;
+      transition: opacity .25s var(--ease);
+      background:
+        radial-gradient(260px 180px at var(--hx) var(--hy),
+          rgba(92,214,255,.12),
+          rgba(166,99,255,.10) 35%,
+          transparent 70%);
+    }
+    .hero-card:hover::after{ opacity:1; }
+
+    .hero-inner{ position:relative; padding: clamp(20px, 3vw, 34px); }
+    .badges{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+    .badge{
+      font-size:.86rem; color: rgba(255,255,255,.78);
+      padding:7px 10px; border-radius:999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      user-select:none;
+    }
+    .badge.glow{
+      border-color: rgba(255,255,255,.14);
+      background: linear-gradient(135deg, rgba(166,99,255,.14), rgba(255,110,199,.10), rgba(92,214,255,.10));
+      box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset;
+    }
+    h1{
+      font-size: var(--h1);
+      letter-spacing: -0.02em;
+      margin: 8px 0 10px;
+      line-height: 1.06;
+    }
+    .lead{
+      font-size: var(--p);
+      color: var(--muted);
+      line-height: 1.55;
+      margin: 0 0 18px;
+      max-width: 75ch;
+    }
+    .cta-row{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top: 18px; }
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding: 12px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      color: rgba(255,255,255,.92);
+      font-weight: 680;
+      letter-spacing: .15px;
+      cursor:pointer; user-select:none; min-height:44px;
+      transition: transform .12s var(--ease), box-shadow .25s var(--ease), background .25s var(--ease), border-color .25s var(--ease), filter .25s var(--ease);
+      outline:none;
+      position:relative;
+      overflow:hidden;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 12px 26px rgba(0,0,0,.30);
+      filter: brightness(1.03);
+    }
+    .btn:active{ transform: scale(.98); transition-duration: .08s; }
+    .btn:focus-visible{ outline: 2px solid rgba(92,214,255,.45); outline-offset: 2px; }
+
+    .btn.primary{
+      border-color: rgba(255,255,255,.14);
+      background: linear-gradient(135deg, rgba(166,99,255,.30), rgba(255,110,199,.22), rgba(92,214,255,.22));
+      box-shadow: 0 14px 34px rgba(0,0,0,.42);
+    }
+    .btn.primary::after{
+      content:""; position:absolute; inset:-60%;
+      background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.18), transparent 55%);
+      transform: rotate(20deg); opacity:.7; pointer-events:none;
+    }
+
+    .hero-side{ display:grid; gap:14px; }
+
+    /* Seções */
+    section{ padding: clamp(26px, 4vw, 46px) 0; }
+    .section-head{ display:flex; flex-direction:column; gap:10px; margin-bottom: 18px; }
+    .kicker{
+      font-size: .92rem;
+      color: rgba(255,255,255,.74);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    h2{ font-size: var(--h2); margin:0; letter-spacing:-0.015em; line-height:1.15; }
+    .subhead{
+      font-size: var(--p);
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 80ch;
+      margin:0;
+    }
+
+    .grid{ display:grid; gap: 14px; grid-template-columns: 1fr; }
+
+    /* Cards com hover + brilho local */
+    .card{
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.09);
+      box-shadow: var(--shadow-soft);
+      overflow:hidden;
+      position:relative;
+      transform: translateZ(0);
+      transition: transform .18s var(--ease), box-shadow .25s var(--ease), border-color .25s var(--ease);
+      --hx: 50%;
+      --hy: 50%;
+    }
+    .card::before{
+      content:""; position:absolute; inset:-2px;
+      background:
+        radial-gradient(260px 120px at 15% 15%, rgba(166,99,255,.14), transparent 60%),
+        radial-gradient(260px 120px at 85% 20%, rgba(255,110,199,.12), transparent 60%),
+        radial-gradient(260px 120px at 70% 110%, rgba(92,214,255,.10), transparent 60%);
+      opacity: .0;
+      transition: opacity .25s var(--ease);
+      pointer-events:none;
+    }
+    .card::after{
+      content:"";
+      position:absolute; inset:-2px;
+      pointer-events:none;
+      opacity:0;
+      transition: opacity .25s var(--ease);
+      background:
+        radial-gradient(220px 160px at var(--hx) var(--hy),
+          rgba(92,214,255,.10),
+          rgba(166,99,255,.08) 35%,
+          transparent 70%);
+    }
+    .card:hover{
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,.14);
+      box-shadow: 0 18px 42px rgba(0,0,0,.45);
+    }
+    .card:hover::before{ opacity:.55; }
+    .card:hover::after{ opacity:1; }
+    .card:focus-within{
+      border-color: rgba(92,214,255,.28);
+      box-shadow: 0 0 0 3px rgba(92,214,255,.14), 0 18px 42px rgba(0,0,0,.45);
+    }
+    .card-inner{ padding: 16px 16px 14px; position:relative; }
+    .card h3{ font-size: var(--h3); margin: 0 0 8px; line-height:1.2; letter-spacing:-0.01em; }
+    .card p{ margin:0; color: var(--muted); font-size: var(--p); line-height: 1.55; }
+
+    .pill-row{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .pill{
+      font-size: .86rem;
+      color: rgba(255,255,255,.74);
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.16);
+    }
+
+    /* Reveal */
+    .reveal{
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity .6s var(--ease-out), transform .6s var(--ease-out);
+      will-change: opacity, transform;
+    }
+    .reveal.in{ opacity: 1; transform: translateY(0); }
+    .stagger > *{ transition-delay: calc(var(--i, 0) * 70ms); }
+
+    /* Responsivo */
+    @media (min-width: 720px){
+      .hero-grid{ grid-template-columns: 1.35fr .65fr; gap: 18px; align-items: stretch; }
+      .grid.cols-2{ grid-template-columns: repeat(2, 1fr); }
+      .grid.cols-3{ grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 720px){
+      .container{ width:min(var(--container), calc(100% - 24px)); }
+
+      .topbar{ justify-content:space-between; padding: 10px 0; gap: 10px; flex-wrap:nowrap; }
+
+      .brand-logo{ height:30px; max-width:165px; padding:2px 6px; border-radius:8px; }
+      .brand-text span{ display:none; }
+      .brand-text strong{ font-size:1.02rem; }
+
+      /* Menu mobile (drawer) */
+      nav.quick{
+        display:none;
+        position: fixed;
+        top: var(--header-h, 68px);
+        left: 10px;
+        right: 10px;
+        z-index: 70;
+        padding: 12px;
+        border-radius: 18px;
+        background: rgba(7,8,11,.92);
+        border: 1px solid rgba(255,255,255,.10);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        max-height: calc(100dvh - var(--header-h, 68px) - 22px - env(safe-area-inset-bottom));
+        overflow:auto;
+      }
+      body.menu-open nav.quick{ display:flex; }
+      nav.quick .chip-link{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        padding: 12px 12px;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(255,255,255,.03);
+      }
+
+      .menu-btn{ display:grid; place-items:center; }
+      body.menu-open{ overflow:hidden; }
+
+      .brand-text span{ max-width: 58vw; }
+      .hero{ padding-top: 20px; }
+    }
+
+    @media (max-width: 420px){
+      .container{ width:min(var(--container), calc(100% - 18px)); }
+      .brand-logo{ height:24px; max-width:132px; padding:1px 5px; border-radius:8px; }
+      .chart-head{ flex-wrap:wrap; gap:8px; align-items:flex-start; }
+      .bars{ grid-template-columns: 1fr; }
+      .bar-pill{ justify-self:start; }
+      .donut{ flex-wrap:wrap; }
+    }
+
+    @media (max-height: 440px) and (orientation: landscape){
+      .container{ width:min(var(--container), calc(100% - 24px)); }
+
+      .topbar{ justify-content:space-between; padding: 8px 0; gap: 10px; flex-wrap:nowrap; }
+      .brand-logo{ height:22px; max-width:140px; padding:1px 5px; border-radius:8px; }
+      .brand-text span{ display:none; }
+      section{ padding: 18px 0; }
+      .hero{ padding: 16px 0 6px; }
+
+      /* Ativa o drawer também no horizontal (altura baixa) */
+      nav.quick{
+        display:none;
+        position: fixed;
+        top: var(--header-h, 60px);
+        left: 10px;
+        right: 10px;
+        z-index: 70;
+        padding: 12px;
+        border-radius: 18px;
+        background: rgba(7,8,11,.92);
+        border: 1px solid rgba(255,255,255,.10);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        max-height: calc(100dvh - var(--header-h, 60px) - 14px - env(safe-area-inset-bottom));
+        overflow:auto;
+      }
+      body.menu-open nav.quick{ display:flex; }
+      nav.quick .chip-link{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        padding: 12px 12px;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(255,255,255,.03);
+      }
+
+      .menu-btn{ display:grid; place-items:center; }
+      body.menu-open{ overflow:hidden; }
+    }
+  </style>
+
+<style id="patch-header-tidy">
+  /* PATCH: header layout (no cuts), clean hierarchy, cross-platform flags */
+  @media (min-width: 900px){
+    nav.quick{ justify-content:center; overflow:visible; padding:0; }
+    nav.quick .chip-link{ font-size:.92rem; padding:9px 12px; box-shadow:none; }
+    .top-actions{ gap:10px; }
+  }
+
+  /* Esconde atalhos no mobile (mantém no drawer) */
+  @media (max-width: 1020px){
+    .aux-actions{ display:none; }
+  }
+
+  @media (max-width: 1200px){
+    .brand-text span{ display:none; }
+    .brand-text strong{ font-size: 1.28rem; }
+    .brand-logo{ height: 52px; max-width: 170px; }
+  }
+
+  @media (min-width: 900px){
+    .brand-logo{ max-width: 190px; }
+  }
+
+  /* flags consistentes (evita BR BR / ES ES no Windows) */
+  .flag-img{
+    width: 18px;
+    height: 12px;
+    border-radius: 2px;
+    margin-left: 6px;
+    object-fit: cover;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.25);
+  }
+  :root[data-theme="light"] .flag-img{
+    box-shadow: 0 0 0 1px rgba(0,0,0,.14);
+  }
+</style>
+
+</head>
+
+<body>
+  <div class="cursor-spotlight" aria-hidden="true"></div>
+  <div class="bg-magic" aria-hidden="true"></div>
+  <a class="skip-link" href="#conteudo" data-i18n="skip">Pular para o conteúdo</a>
+
+  <header class="site-top" id="topo">
+    <div class="container">
+      <div class="topbar">
+        <a class="brand" href="#topo" aria-label="PubComTec (voltar ao topo)">
+          <div class="brand-text">
+            <strong>PubComTec</strong>
+            <span data-i18n="topbar_tagline">UFRJ/ECO - UdG</span>
+          </div>
+          <img class="brand-logo" src="https://eco.ufrj.br/wp-content/themes/arion/assets/images/ufrj-horizontal-simplificada-negativa.png" alt="UFRJ" loading="lazy" decoding="async">
+        </a>
+
+        <nav class="quick" id="siteNav" aria-label="Navegação rápida">
+          <a class="chip-link" href="#achados" data-i18n="nav_findings">Descobertas</a>
+          <a class="chip-link" href="#publicacoes" data-i18n="nav_outputs">Produção</a>
+          <a class="chip-link" href="#contato" data-i18n="nav_contact">Contato</a>
+
+          <a class="chip-link nav-secondary" href="#sobre" data-i18n="nav_about">Sobre</a>
+          <a class="chip-link nav-secondary" href="#perguntas" data-i18n="nav_questions">Perguntas</a>
+          <a class="chip-link nav-secondary" href="#metodologia" data-i18n="nav_method">Método</a>
+          <a class="chip-link nav-secondary" href="#repia" data-i18n="nav_repia">REPIA</a>
+          <a class="chip-link nav-secondary" href="#participar" data-i18n="nav_join">Participar</a>
+          <a class="chip-link nav-secondary" href="#faq" data-i18n="nav_faq">FAQ</a>
+        </nav>
+
+        <div class="top-actions" aria-label="Ações">
+          <button class="menu-btn" id="btnMenu" type="button" aria-controls="siteNav" aria-expanded="false" aria-label="Menu">
+            <span class="menu-icon" aria-hidden="true">☰</span>
+          </button>
+
+          <div class="aux-actions" aria-label="Atalhos">
+            <a class="aux-link" href="#metodologia" data-i18n="nav_method">Método</a>
+            <a class="aux-link" href="#participar" data-i18n="nav_join">Participar</a>
+            <a class="aux-link" href="#faq" data-i18n="nav_faq">FAQ</a>
+          </div>
+
+          <div class="lang-toggle" role="group" aria-label="Alternar idioma">
+            <button class="lang-btn" id="btnPT" type="button" aria-pressed="true" aria-label="Português (Brasil)">BR <img class="flag-img" src="https://flagcdn.com/w20/br.png" srcset="https://flagcdn.com/w40/br.png 2x" alt="" aria-hidden="true"></button>
+            <button class="lang-btn" id="btnES" type="button" aria-pressed="false" aria-label="Español (España)">ES <img class="flag-img" src="https://flagcdn.com/w20/es.png" srcset="https://flagcdn.com/w40/es.png 2x" alt="" aria-hidden="true"></button>
+          </div>
+
+          <div class="theme-toggle" aria-label="Alternar tema">
+            <button class="theme-btn" id="btnTheme" type="button" aria-pressed="false">
+              <span class="theme-icon" aria-hidden="true">🌙</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="nav-backdrop" id="navBackdrop" aria-hidden="true"></div>
+
+
+<div id="topSentinel" aria-hidden="true" style="position:absolute;top:0;left:0;width:1px;height:1px;"></div>
+<main id="conteudo">
+    <section class="hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="hero-card reveal">
+            <div class="hero-inner">
+              <div class="badges">
+                <span class="badge glow" data-i18n="badge_institutions">UFRJ/ECO - UdG</span>
+                <span class="badge" data-i18n="badge_genai">IA Generativa</span>
+                <span class="badge" data-i18n="badge_ethics">Ética</span>
+                <span class="badge" data-i18n="badge_training">Formação</span>
+                <span class="badge" data-i18n="badge_compare">Brasil × Catalunha</span>
+              </div>
+
+              <h1 data-i18n="hero_title">PubComTec — Inteligência Artificial na Publicidade e Propaganda</h1>
+              <p class="lead" data-i18n="hero_subtitle">
+                Investigamos como a IA generativa está reconfigurando a prática publicitária — do uso real em agências às consequências éticas e curriculares na formação de futuras(os) publicitárias(os).
+              </p>
+
+              <div class="cta-row">
+                <a class="btn primary" href="#participar" data-i18n="cta_join">Entrar na REPIA</a>
+                <a class="btn" href="#achados" data-i18n="cta_explore">Ver descobertas</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-side">
+            <div class="card reveal">
+              <div class="card-inner">
+                <h3 data-i18n="side_1_title">O que mapeamos</h3>
+                <p data-i18n="side_1_desc">
+                  Ferramentas de IA, áreas que mais utilizam e frequência — e como isso altera processos criativos e de gestão.
+                </p>
+                <div class="pill-row" aria-hidden="true">
+                  <span class="pill" data-i18n="pill_diag">Diagnóstico</span>
+                  <span class="pill" data-i18n="pill_process">Processos</span>
+                  <span class="pill" data-i18n="pill_impact">Impactos</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card reveal">
+              <div class="card-inner">
+                <h3 data-i18n="side_2_title">Por que importa</h3>
+                <p data-i18n="side_2_desc">
+                  Quando tecnologia entra no fluxo, mudam autoria, responsabilidade, direitos e a própria noção de criatividade.
+                </p>
+                <div class="pill-row" aria-hidden="true">
+                  <span class="pill" data-i18n="pill_ethics">Ética</span>
+                  <span class="pill" data-i18n="pill_authorship">Autoria</span>
+                  <span class="pill" data-i18n="pill_curriculum">Currículo</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card reveal">
+              <div class="card-inner">
+                <h3 data-i18n="side_3_title">Coordenação</h3>
+                <p data-i18n="side_3_desc">Coordenadora: Maria Alice de Faria Nogueira.</p>
+                <div class="pill-row" aria-hidden="true">
+                  <span class="pill" data-i18n="pill_linkedin">@pubcomtec</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SOBRE -->
+    <section id="sobre">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="kicker" data-i18n="kicker_about">Sobre</div>
+          <h2 data-i18n="about_title">Tecnologia, publicidade e ética em perspectiva comparada</h2>
+          <p class="subhead" data-i18n="about_subhead">
+            O PubComTec é um grupo de pesquisa da ECO-UFRJ em parceria com a Universitat de Girona que investiga o atravessamento das tecnologias digitais — especialmente a IA generativa — na prática publicitária contemporânea e seus efeitos éticos e formativos.
+          </p>
+        </div>
+
+        <div class="grid cols-2 reveal stagger">
+          <div class="card" style="--i:0">
+            <div class="card-inner">
+              <h3 data-i18n="about_card1_title">Do uso real às consequências</h3>
+              <p data-i18n="about_card1_desc">
+                Partimos do mapeamento de ferramentas e rotinas em agências para compreender impactos concretos em processos criativos, decisões estratégicas e perfis profissionais.
+              </p>
+            </div>
+          </div>
+
+          <div class="card" style="--i:1">
+            <div class="card-inner">
+              <h3 data-i18n="about_card2_title">Formação no centro do debate</h3>
+              <p data-i18n="about_card2_desc">
+                Mais do que eficiência técnica, investigamos como a IA reposiciona autoria, responsabilidade, ética e currículo na formação de futuras(os) publicitárias(os).
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PERGUNTAS -->
+    <section id="perguntas">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="kicker" data-i18n="kicker_questions">Perguntas</div>
+          <h2 data-i18n="questions_title">Questões que orientam a pesquisa</h2>
+          <p class="subhead" data-i18n="questions_subhead">
+            Perguntas que ajudam a compreender transformações reais no mercado e seus reflexos na formação acadêmica.
+          </p>
+        </div>
+
+        <div class="grid cols-3 reveal stagger">
+          <div class="card" style="--i:0">
+            <div class="card-inner">
+              <h3 data-i18n="q1_title">Criatividade em xeque?</h3>
+              <p data-i18n="q1_desc">
+                A IA se torna mais importante que a criatividade humana ou redefine o que entendemos por criação publicitária?
+              </p>
+            </div>
+          </div>
+
+          <div class="card" style="--i:1">
+            <div class="card-inner">
+              <h3 data-i18n="q2_title">Novas competências</h3>
+              <p data-i18n="q2_desc">
+                O publicitário do futuro precisa ser mais técnico? Como equilibrar repertório cultural, método e pensamento crítico?
+              </p>
+            </div>
+          </div>
+
+          <div class="card" style="--i:2">
+            <div class="card-inner">
+              <h3 data-i18n="q3_title">Responsabilidade e ética</h3>
+              <p data-i18n="q3_desc">
+                O que muda em autoria, transparência e responsabilidade quando a IA entra no fluxo de trabalho?
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- METODOLOGIA -->
+    <section id="metodologia">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="kicker" data-i18n="kicker_method">Metodologia</div>
+          <h2 data-i18n="method_title">Escuta do mercado e análise comparativa</h2>
+          <p class="subhead" data-i18n="method_subhead">
+            A pesquisa adota metodologia mista, combinando análise qualitativa e quantitativa em contextos distintos.
+          </p>
+        </div>
+
+        <div class="grid cols-3 reveal stagger">
+          <div class="card" style="--i:0">
+            <div class="card-inner">
+              <h3 data-i18n="m1_title">Entrevistas</h3>
+              <p data-i18n="m1_desc">
+                CEOs, diretores(as) de criação e lideranças de agências de diferentes portes.
+              </p>
+            </div>
+          </div>
+
+          <div class="card" style="--i:1">
+            <div class="card-inner">
+              <h3 data-i18n="m2_title">Contextos</h3>
+              <p data-i18n="m2_desc">
+                Brasil (Rio de Janeiro) e Espanha (Catalunha), permitindo leitura comparada entre mercados.
+              </p>
+            </div>
+          </div>
+
+          <div class="card" style="--i:2">
+            <div class="card-inner">
+              <h3 data-i18n="m3_title">Análise</h3>
+              <p data-i18n="m3_desc">
+                Processos criativos, rotinas de trabalho, ética, regulação e impactos na formação discente.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACHADOS / RESULTADOS -->
+    <section id="achados">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="kicker" data-i18n="kicker_findings">Descobertas</div>
+          <h2 data-i18n="findings_title">O que a pesquisa revela</h2>
+          <p class="subhead" data-i18n="findings_subhead">
+            Tendências observadas no uso de IA generativa nas agências e seus principais efeitos.
+          </p>
+        </div>
+
+        <div class="grid cols-3 reveal stagger">
+          <!-- Uso de IA -->
+          <div class="card" style="--i:0">
+            <div class="card-inner">
+              <h3 data-i18n="f1_title">Uso de IA nas agências</h3>
+              <p data-i18n="f1_desc">
+                Adoção crescente e transversal, com maior incidência em criação e produção.
+              </p>
+
+              <div class="mini-charts">
+                <div class="chart">
+                  <div class="chart-head">
+                    <span class="chart-title" data-i18n="chart_areas">Áreas mais impactadas</span>
+                  </div>
+                  <div class="bars">
+                    <div class="bar-wrap">
+                      <div class="bar-fill" style="--v:.85"></div>
+                    </div>
+                    <span class="bar-pill" data-i18n="bar_creation">Criação</span>
+
+                    <div class="bar-wrap">
+                      <div class="bar-fill" style="--v:.65"></div>
+                    </div>
+                    <span class="bar-pill" data-i18n="bar_production">Produção</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ética -->
+          <div class="card" style="--i:1">
+            <div class="card-inner">
+              <h3 data-i18n="f2_title">Questões éticas</h3>
+              <p data-i18n="f2_desc">
+                Diferenças relevantes entre contextos regulatórios e práticas institucionais.
+              </p>
+
+              <div class="donuts">
+                <div class="donut">
+                  <div class="ring" style="--p:.75"></div>
+                  <div>
+                    <strong data-i18n="ethics_eu">Europa</strong>
+                    <span data-i18n="ethics_eu_desc">Regulação mais estruturada</span>
+                  </div>
+                </div>
+                <div class="donut">
+                  <div class="ring" style="--p:.45"></div>
+                  <div>
+                    <strong data-i18n="ethics_br">Brasil</strong>
+                    <span data-i18n="ethics_br_desc">Debate em consolidação</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formação -->
+          <div class="card" style="--i:2">
+            <div class="card-inner">
+              <h3 data-i18n="f3_title">Formação discente</h3>
+              <p data-i18n="f3_desc">
+                Convergência entre domínio técnico e pensamento crítico como eixo central.
+              </p>
+
+              <div class="pulse">
+                <div class="pulse-label">
+                  <strong data-i18n="pulse_training">Competência-chave</strong>
+                  <span data-i18n="pulse_training_desc">crítica + técnica</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+<!-- =========================
+     THEME PART 1/3 — CSS
+========================== -->
+
+<style>
+/* =========================
+   LIGHT MODE (variáveis)
+   Ativado com: <html data-theme="light">
+========================== */
+
+:root[data-theme="light"]{
+  --bg-0:#f6f7fb;
+  --bg-1:#ffffff;
+  --bg-2:#eef1f8;
+
+  --panel:rgba(0,0,0,.04);
+  --panel-2:rgba(0,0,0,.06);
+
+  --stroke:rgba(0,0,0,.08);
+  --stroke-2:rgba(0,0,0,.14);
+
+  --text:rgba(10,10,15,.92);
+  --muted:rgba(10,10,15,.70);
+  --muted-2:rgba(10,10,15,.55);
+
+  --shadow:0 14px 40px rgba(0,0,0,.18);
+  --shadow-soft:0 10px 24px rgba(0,0,0,.12);
+  --a1: rgba(92,44,210,.92);
+  --a2: rgba(198,64,156,.88);
+  --a3: rgba(18,116,214,.88);
+}
+
+/* Ajustes específicos do light mode */
+:root[data-theme="light"] body{
+  background:
+    radial-gradient(1200px 600px at 10% 10%, rgba(166,99,255,.12), transparent 55%),
+    radial-gradient(900px 520px at 90% 20%, rgba(255,110,199,.10), transparent 58%),
+    radial-gradient(900px 520px at 70% 90%, rgba(92,214,255,.10), transparent 58%),
+    linear-gradient(180deg, var(--bg-0), var(--bg-1) 40%, var(--bg-2));
+}
+
+:root[data-theme="light"] header.site-top{
+  background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.55));
+  border-bottom: 1px solid rgba(0,0,0,.08);
+}
+
+:root[data-theme="light"] .card,
+:root[data-theme="light"] .hero-card,
+:root[data-theme="light"] .item,
+:root[data-theme="light"] .faq{
+  background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.7));
+}
+
+/* =========================
+   Transição suave entre temas
+========================== */
+html{
+  transition:
+    background-color .35s ease,
+    color .35s ease;
+}
+
+body, .card, .hero-card, .item, header.site-top{
+  transition:
+    background .35s ease,
+    color .35s ease,
+    box-shadow .35s ease,
+    border-color .35s ease;
+}
+/* =========================
+   FIX: botão de tema com cara premium
+========================== */
+.theme-toggle{ display:flex; align-items:center; }
+
+.theme-btn{
+  width: 44px !important;
+  height: 44px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+
+  border: 1px solid rgba(255,255,255,.14) !important;
+  background:
+    radial-gradient(closest-side at 30% 30%, rgba(255,255,255,.12), transparent 60%),
+    linear-gradient(135deg, rgba(166,99,255,.22), rgba(92,214,255,.18), rgba(255,110,199,.16)) !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  box-shadow: 0 16px 34px rgba(0,0,0,.45) !important;
+  color: rgba(255,255,255,.92) !important;
+
+  cursor: pointer !important;
+  transition: transform .12s var(--ease), filter .25s var(--ease), box-shadow .25s var(--ease) !important;
+}
+
+.theme-btn:hover{
+  transform: translateY(-1px) !important;
+  filter: brightness(1.05) !important;
+  box-shadow: 0 18px 40px rgba(0,0,0,.55) !important;
+}
+
+.theme-btn:active{ transform: scale(.97) !important; }
+
+nav.quick .theme-icon{ font-size: 1.05rem !important; line-height: 1 !important; }
+
+/* Light: manter contraste */
+:root[data-theme="light"] .theme-btn{
+  border-color: rgba(0,0,0,.12) !important;
+  color: rgba(10,10,15,.90) !important;
+  box-shadow: 0 14px 30px rgba(0,0,0,.18) !important;
+}
+/* =========================
+   FIX: legibilidade no LIGHT MODE
+========================== */
+
+/* 1) Títulos com gradiente: usar gradiente mais escuro no light */
+:root[data-theme="light"] h1[data-i18n],
+:root[data-theme="light"] h2[data-i18n]{
+  background: linear-gradient(90deg,
+    rgba(46,116,180,1),
+    rgba(110,61,200,1),
+    rgba(210,55,150,1)
+  );
+  -webkit-background-clip:text;
+  background-clip:text;
+  color: transparent;
+  text-shadow: none; /* remove sombra que pode “lavar” no claro */
+}
+
+/* 2) Subtítulos e textos: garantir contraste */
+:root[data-theme="light"] .lead,
+:root[data-theme="light"] .subhead,
+:root[data-theme="light"] .card p,
+:root[data-theme="light"] .fine{
+  color: rgba(10,10,15,.78);
+}
+
+/* 3) Pills/tags: deixar texto escuro */
+:root[data-theme="light"] .pill,
+:root[data-theme="light"] .tag,
+:root[data-theme="light"] .badge{
+  color: rgba(10,10,15,.72);
+  border-color: rgba(0,0,0,.10);
+  background: rgba(0,0,0,.04);
+}
+
+/* 4) Links chips do menu: mais contraste */
+:root[data-theme="light"] .chip-link{
+  color: rgba(10,10,15,.76);
+  background: rgba(0,0,0,.03);
+  border-color: rgba(0,0,0,.10);
+}
+:root[data-theme="light"] .chip-link:hover{
+  color: rgba(10,10,15,.92);
+  background: rgba(0,0,0,.06);
+  border-color: rgba(0,0,0,.16);
+  box-shadow: 0 10px 22px rgba(0,0,0,.12);
+}
+:root[data-theme="light"] .chip-link.is-active,
+:root[data-theme="light"] .chip-link[aria-current="page"]{
+  color: rgba(10,10,15,.92);
+  border-color: rgba(0,0,0,.16);
+  background: linear-gradient(135deg, rgba(92,214,255,.20), rgba(166,99,255,.16), rgba(255,110,199,.12));
+  box-shadow: 0 14px 30px rgba(0,0,0,.12);
+}
+:root[data-theme="light"] .action-link{
+  color: rgba(10,10,15,.90);
+  background: rgba(0,0,0,.03);
+  border-color: rgba(0,0,0,.12);
+  box-shadow: 0 10px 20px rgba(0,0,0,.08);
+}
+:root[data-theme="light"] .action-link:hover{
+  background: rgba(0,0,0,.06);
+  border-color: rgba(0,0,0,.16);
+  box-shadow: 0 12px 22px rgba(0,0,0,.10);
+}
+:root[data-theme="light"] .action-link.cta{
+  color: rgba(10,10,15,.96);
+  border-color: rgba(0,0,0,.08);
+}
+/* 5) Cards: bordas e fundo mais “limpos” */
+:root[data-theme="light"] .card,
+:root[data-theme="light"] .hero-card,
+:root[data-theme="light"] .item,
+:root[data-theme="light"] .faq{
+  border-color: rgba(0,0,0,.10);
+  background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.78));
+}
+
+
+
+/* =========================
+   LIGHT MODE — botões e contraste extra
+========================== */
+
+:root[data-theme="light"] .btn{
+  color: rgba(10,10,15,.92);
+  background: rgba(0,0,0,.03);
+  border-color: rgba(0,0,0,.12);
+  box-shadow: 0 12px 22px rgba(0,0,0,.10);
+}
+:root[data-theme="light"] .btn:hover{
+  background: rgba(0,0,0,.05);
+  border-color: rgba(0,0,0,.18);
+  box-shadow: 0 14px 28px rgba(0,0,0,.12);
+}
+:root[data-theme="light"] .btn.primary{
+  color: rgba(10,10,15,.95);
+  border-color: rgba(0,0,0,.10);
+  background: linear-gradient(135deg, rgba(18,116,214,.22), rgba(92,44,210,.20), rgba(198,64,156,.16));
+  box-shadow: 0 16px 34px rgba(0,0,0,.14);
+}
+:root[data-theme="light"] .btn.primary:hover{
+  filter: none;
+  background: linear-gradient(135deg, rgba(18,116,214,.28), rgba(92,44,210,.25), rgba(198,64,156,.20));
+}
+
+:root[data-theme="light"] .kicker{
+  color: rgba(10,10,15,.62);
+}
+
+:root[data-theme="light"] .badge{
+  background: rgba(0,0,0,.03);
+  border-color: rgba(0,0,0,.10);
+}
+
+:root[data-theme="light"] .aux-link{
+  color: rgba(10,10,15,.75);
+}
+:root[data-theme="light"] .aux-link:hover{
+  color: rgba(10,10,15,.92);
+  background: rgba(0,0,0,.05);
+}
+
+:root[data-theme="light"] .chart{
+  background: rgba(255,255,255,.75);
+  border-color: rgba(0,0,0,.10);
+}
+:root[data-theme="light"] .chart-title{
+  color: rgba(10,10,15,.70);
+}
+:root[data-theme="light"] .bar-wrap{
+  background: rgba(0,0,0,.04);
+  border-color: rgba(0,0,0,.10);
+}
+
+</style>
+
+    <style>
+      /* Mini componentes dos achados (mantidos aqui para evitar “quebrar” a parte 1) */
+      .mini-charts{ margin-top:14px; }
+      .chart{
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(0,0,0,.18);
+        padding: 12px;
+      }
+      .chart-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+      .chart-title{ font-size: .92rem; color: rgba(255,255,255,.72); letter-spacing:.02em; }
+      .bars{ display:grid; grid-template-columns: 1fr auto; gap:10px 10px; align-items:center; }
+      .bar-wrap{
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.06);
+        border: 1px solid rgba(255,255,255,.08);
+        overflow:hidden;
+      }
+      .bar-fill{
+        height: 100%;
+        width: calc(var(--v, .5) * 100%);
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(92,214,255,.85), rgba(166,99,255,.85), rgba(255,110,199,.75));
+        box-shadow: 0 0 0 1px rgba(255,255,255,.10) inset;
+        transform-origin: left;
+        transform: scaleX(.6);
+        opacity:.9;
+      }
+      .reveal.in .bar-fill{ transform: scaleX(1); transition: transform 900ms var(--ease-out); }
+      .bar-pill{
+        font-size:.84rem;
+        color: rgba(255,255,255,.70);
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(255,255,255,.03);
+        white-space:nowrap;
+      }
+
+      .donuts{ margin-top: 14px; display:grid; gap:10px; }
+      .donut{
+        display:flex; align-items:center; gap:12px;
+        padding: 12px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(0,0,0,.18);
+      }
+      .ring{
+        width:46px; height:46px; border-radius: 999px;
+        background:
+          conic-gradient(
+            rgba(166,99,255,.92) calc(var(--p, .5) * 360deg),
+            rgba(255,255,255,.08) 0
+          );
+        position:relative;
+        box-shadow: 0 10px 20px rgba(0,0,0,.25);
+        border: 1px solid rgba(255,255,255,.10);
+      }
+      .ring::after{
+        content:"";
+        position:absolute; inset:7px;
+        border-radius:999px;
+        background: rgba(7,8,11,.9);
+        border: 1px solid rgba(255,255,255,.06);
+      }
+      .donut strong{ display:block; font-size:.96rem; letter-spacing:.2px; }
+      .donut span{ display:block; font-size:.88rem; color: rgba(255,255,255,.62); margin-top:2px; }
+
+      .pulse{
+        margin-top:14px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(0,0,0,.18);
+        padding: 14px;
+        position:relative;
+        overflow:hidden;
+      }
+      .pulse::before{
+        content:"";
+        position:absolute; inset:-60%;
+        background:
+          radial-gradient(circle at 35% 40%, rgba(92,214,255,.12), transparent 52%),
+          radial-gradient(circle at 65% 55%, rgba(166,99,255,.12), transparent 55%),
+          radial-gradient(circle at 55% 35%, rgba(255,110,199,.08), transparent 55%);
+        opacity:.8;
+        animation: pulse 2.8s var(--ease-out) infinite;
+      }
+      @keyframes pulse{
+        0%{ transform: scale(.98); opacity:.55; }
+        50%{ transform: scale(1.05); opacity:.85; }
+        100%{ transform: scale(.98); opacity:.55; }
+      }
+      .pulse-label{ position:relative; display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+      .pulse-label strong{ font-size: 1rem; }
+      .pulse-label span{ font-size:.9rem; color: rgba(255,255,255,.68); }
+
+      /* Produção / publicações */
+      .list{
+        display:grid; gap:12px;
+      }
+      .item{
+        border-radius: var(--radius);
+        border: 1px solid rgba(255,255,255,.09);
+        background: rgba(255,255,255,.03);
+        padding: 14px;
+        box-shadow: 0 10px 22px rgba(0,0,0,.25);
+        position:relative;
+        overflow:hidden;
+      }
+      .item::after{
+        content:"";
+        position:absolute; inset:-2px;
+        background: radial-gradient(240px 160px at var(--hx,50%) var(--hy,50%),
+          rgba(92,214,255,.10),
+          rgba(166,99,255,.08) 35%,
+          transparent 70%);
+        opacity:0;
+        transition: opacity .25s var(--ease);
+        pointer-events:none;
+      }
+      .item:hover::after{ opacity:1; }
+      .item-top{ display:flex; gap:10px; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; }
+      .item h3{ margin:0; font-size: 1.05rem; line-height:1.25; }
+      .meta{
+        display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;
+        color: rgba(255,255,255,.62);
+        font-size:.9rem;
+      }
+      .tag{
+        padding:6px 10px; border-radius:999px;
+        border: 1px solid rgba(255,255,255,.09);
+        background: rgba(0,0,0,.18);
+        white-space:nowrap;
+      }
+
+      /* FAQ */
+      .faq{
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(255,255,255,.09);
+        background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+        overflow:hidden;
+        box-shadow: var(--shadow-soft);
+      }
+      details{
+        border-top: 1px solid rgba(255,255,255,.07);
+        padding: 14px 16px;
+      }
+      details:first-child{ border-top:0; }
+      summary{
+        list-style:none; cursor:pointer;
+        display:flex; align-items:center; justify-content:space-between; gap:10px;
+        font-weight: 720;
+        color: rgba(255,255,255,.88);
+      }
+      summary::-webkit-details-marker{ display:none; }
+      .chev{
+        width: 12px; height: 12px;
+        border-right: 2px solid rgba(255,255,255,.55);
+        border-bottom: 2px solid rgba(255,255,255,.55);
+        transform: rotate(45deg);
+        transition: transform .25s var(--ease);
+        margin-left: 8px;
+        flex:0 0 auto;
+      }
+      details[open] .chev{ transform: rotate(225deg); }
+      details p{ margin: 10px 0 0; color: rgba(255,255,255,.70); line-height: 1.6; font-size: var(--p); }
+
+      /* Footer */
+      footer{
+        padding: 34px 0 46px;
+        border-top: 1px solid rgba(255,255,255,.06);
+        background: linear-gradient(180deg, transparent, rgba(0,0,0,.18));
+      }
+      .footer-grid{
+        display:grid; gap: 14px;
+        grid-template-columns: 1fr;
+        align-items:start;
+      }
+      .fine{ color: rgba(255,255,255,.60); font-size: var(--small); line-height:1.5; }
+      .links{ display:flex; flex-wrap:wrap; gap:10px; }
+      .link{
+        display:inline-flex; align-items:center; justify-content:center;
+        padding: 10px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.10);
+        background: rgba(255,255,255,.03);
+        color: rgba(255,255,255,.84);
+        transition: transform .12s var(--ease), background .25s var(--ease), border-color .25s var(--ease);
+        min-height:44px;
+      }
+      .link:hover{ transform: translateY(-1px); background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.14); }
+      .link:active{ transform: scale(.98); }
+
+      @media (min-width: 720px){
+        .footer-grid{ grid-template-columns: 1.35fr .65fr; }
+      }
+
+      /* Botão “voltar ao topo” */
+      .to-top{
+        position: fixed;
+        right: calc(14px + env(safe-area-inset-right));
+        bottom: calc(14px + env(safe-area-inset-bottom));
+        z-index: 60;
+        opacity: 0;
+        transform: translateY(10px);
+        pointer-events: none;
+        transition: opacity .25s var(--ease), transform .25s var(--ease);
+
+      }
+      .to-top.show{
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+      }
+      .to-top button{
+        width: 46px; height: 46px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.12);
+        background: linear-gradient(135deg, rgba(166,99,255,.28), rgba(92,214,255,.20), rgba(255,110,199,.16));
+        color: rgba(255,255,255,.92);
+        cursor:pointer;
+        box-shadow: 0 16px 34px rgba(0,0,0,.45);
+        display:grid; place-items:center;
+        transition: transform .12s var(--ease), filter .25s var(--ease);
+      }
+      .to-top button:hover{ transform: translateY(-1px); filter: brightness(1.04); }
+      .to-top button:active{ transform: scale(.97); }
+      .arrow-up{
+        width: 12px; height: 12px;
+        border-left: 2px solid rgba(255,255,255,.85);
+        border-top: 2px solid rgba(255,255,255,.85);
+        transform: rotate(45deg);
+        margin-top: 4px;
+      }
+.to-top{ 
+  display:block;
+  -webkit-transform: translateZ(0);
+}
+    
+
+      /* Mobile: evita overflow nas mini métricas (celular) */
+      @media (max-width: 420px){
+        .chart-head{ flex-wrap:wrap; gap:8px; align-items:flex-start; }
+        .bars{ grid-template-columns: 1fr; }
+        .bar-pill{ justify-self:start; max-width:100%; white-space:normal; }
+        .donut{ flex-wrap:wrap; }
+      }
+</style>
+
+    <!-- PRODUÇÃO / PUBLICAÇÕES -->
+    <section id="publicacoes">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="kicker" data-i18n="kicker_outputs">Produção</div>
+          <h2 data-i18n="outputs_title">Publicações e presença acadêmica</h2>
+          <p class="subhead" data-i18n="outputs_subhead">
+            Em 2025, o PubComTec ampliou sua produção e circulação internacional com artigos, capítulos e participação em eventos.
+          </p>
+        </div>
+
+        <div class="list reveal stagger">
+          <article class="item" style="--i:0">
+            <div class="item-top">
+              <h3 data-i18n="out1_title">Artigos em periódicos internacionais (Q1) e artigo nacional (A1) em curso</h3>
+            </div>
+            <div class="meta">
+              <span class="tag" data-i18n="out1_tag1">Telecommunications Policy (inglês)</span>
+              <span class="tag" data-i18n="out1_tag2">Revista Latina de Comunicación Social (espanhol)</span>
+              <span class="tag" data-i18n="out1_tag3">Artigo A1 nacional (no prelo)</span>
+            </div>
+          </article>
+
+          <article class="item" style="--i:1">
+            <div class="item-top">
+              <h3 data-i18n="out2_title">Capítulos de livro (espanhol) e novas coletâneas</h3>
+            </div>
+            <div class="meta">
+              <span class="tag" data-i18n="out2_tag1">Coletânea da RedPub</span>
+              <span class="tag" data-i18n="out2_tag2">Novos capítulos em produção</span>
+              <span class="tag" data-i18n="out2_tag3">“Publicidade sem Fronteiras” (prev.)</span>
+            </div>
+          </article>
+
+          <article class="item" style="--i:2">
+            <div class="item-top">
+              <h3 data-i18n="out3_title">Eventos e coletânea internacional (2026)</h3>
+            </div>
+            <div class="meta">
+              <span class="tag" data-i18n="out3_tag1">Intercom & Propesq (2025)</span>
+              <span class="tag" data-i18n="out3_tag2">ICORIA (2025)</span>
+              <span class="tag" data-i18n="out3_tag3">Advances in Advertising Research (2026)</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- REPIA -->
+    <section id="repia">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="kicker" data-i18n="kicker_repia">REPIA</div>
+          <h2 data-i18n="repia_title">Uma rede para pensar IA e publicidade em conjunto</h2>
+          <p class="subhead" data-i18n="repia_subhead">
+            A REPIA (Rede de Estudos em Publicidade e Inteligência Artificial) reúne pesquisadoras(es) e profissionais para troca contínua de experiências, métodos e agenda de pesquisa.
+          </p>
+        </div>
+
+        <div class="grid cols-3 reveal stagger">
+          <div class="card" style="--i:0">
+            <div class="card-inner">
+              <h3 data-i18n="repia_c1_title">Troca em rede</h3>
+              <p data-i18n="repia_c1_desc">Reuniões, debates e colaboração entre diferentes instituições e regiões.</p>
+            </div>
+          </div>
+          <div class="card" style="--i:1">
+            <div class="card-inner">
+              <h3 data-i18n="repia_c2_title">Interdisciplinaridade</h3>
+              <p data-i18n="repia_c2_desc">Comunicação, tecnologia, ética e formação se cruzam em um mesmo espaço.</p>
+            </div>
+          </div>
+          <div class="card" style="--i:2">
+            <div class="card-inner">
+              <h3 data-i18n="repia_c3_title">Impacto coletivo</h3>
+              <p data-i18n="repia_c3_desc">Produção científica, articulação institucional e fortalecimento de agenda pública.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PARTICIPAR -->
+    <section id="participar">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="kicker" data-i18n="kicker_join">Participar</div>
+          <h2 data-i18n="join_title">Quer contribuir com a comunidade?</h2>
+          <p class="subhead" data-i18n="join_subhead">
+            Se você pesquisa (ou quer pesquisar) IA generativa na publicidade — venha trocar referências, métodos e perguntas.
+          </p>
+        </div>
+
+        <div class="grid cols-2 reveal stagger">
+          <div class="card" style="--i:0">
+            <div class="card-inner">
+              <h3 data-i18n="join_c1_title">Quem pode entrar</h3>
+              <p data-i18n="join_c1_desc">
+                Estudantes, docentes, pesquisadoras(es) e profissionais interessados em publicidade, comunicação, tecnologia e ética.
+              </p>
+              <div class="pill-row" aria-hidden="true">
+                <span class="pill" data-i18n="join_p1">Iniciação científica</span>
+                <span class="pill" data-i18n="join_p2">Mestrado/Doutorado</span>
+                <span class="pill" data-i18n="join_p3">Mercado</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="--i:1">
+            <div class="card-inner">
+              <h3 data-i18n="join_c2_title">Como começar</h3>
+              <p data-i18n="join_c2_desc">
+                Acompanhe o PubComTec no LinkedIn e entre em contato para receber informações sobre reuniões e atividades da REPIA.
+              </p>
+              <div class="cta-row" style="margin-top:12px;">
+                <a class="btn primary" href="#topo" data-i18n="cta_back_menu">Voltar ao menu</a>
+                <a class="btn" href="#faq" data-i18n="cta_faq">Dúvidas frequentes</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="kicker" data-i18n="kicker_faq">FAQ</div>
+          <h2 data-i18n="faq_title">Perguntas frequentes</h2>
+          <p class="subhead" data-i18n="faq_subhead">
+            Respostas rápidas para quem quer entender a proposta e participar.
+          </p>
+        </div>
+
+        <div class="faq reveal">
+          <details>
+            <summary><span data-i18n="faq_q1">O PubComTec é um grupo de pesquisa formal?</span><span class="chev" aria-hidden="true"></span></summary>
+            <p data-i18n="faq_a1">Sim. O PubComTec é um grupo de pesquisa vinculado à ECO-UFRJ em parceria com a Universitat de Girona e está listado no Diretório de Grupos de Pesquisa do CNPq.</p>
+          </details>
+
+          <details>
+            <summary><span data-i18n="faq_q2">Qual é o foco do projeto?</span><span class="chev" aria-hidden="true"></span></summary>
+            <p data-i18n="faq_a2">Investigar ferramentas de IA generativa usadas em agências, por quais áreas, com que frequência e quais consequências isso traz para ética, processos e formação discente.</p>
+          </details>
+
+          <details>
+            <summary><span data-i18n="faq_q3">Como acompanho as novidades?</span><span class="chev" aria-hidden="true"></span></summary>
+            <p data-i18n="faq_a3">Pelo LinkedIn do projeto (@pubcomtec) e pelas comunicações da REPIA sobre reuniões e atividades.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="contato">
+
+    <div class="container">
+      <div class="footer-grid reveal">
+        <div>
+          <div class="brand" style="margin-bottom:10px;">
+            <div class="brand-text">
+              <strong>PubComTec</strong>
+              <span data-i18n="footer_tagline">UFRJ/ECO - UdG • Pesquisa em comunicação, tecnologia e ética</span>
+            </div>
+            <img class="brand-logo" src="https://eco.ufrj.br/wp-content/themes/arion/assets/images/ufrj-horizontal-simplificada-negativa.png" alt="UFRJ" loading="lazy" decoding="async">
+          </div>
+          <p class="fine data-i18n="footer_fine">
+            Grupo de pesquisa sobre Inteligência Artificial na Publicidade e Propaganda. Coordenação: Maria Alice de Faria Nogueira.
+          </p>
+        </div>
+
+        <div>
+          <div class="links">
+            <a class="link" href="#topo" data-i18n="link_top">Topo</a>
+            <a class="link" href="#sobre" data-i18n="link_about">Sobre</a>
+            <a class="link" href="#repia" data-i18n="link_repia">REPIA</a>
+            <a class="link" href="#" onclick="return false" data-i18n="link_cnpq">Diretório CNPq</a>
+            <a class="link" href="#" onclick="return false" data-i18n="link_linkedin">LinkedIn @pubcomtec</a>
+          </div>
+          <p class="fine" style="margin-top:10px;" data-i18n="footer_note">
+            Dica: você pode substituir os links “CNPq” e “LinkedIn” pelos URLs oficiais quando quiser.
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- BOTÃO VOLTAR AO TOPO -->
+  <div class="to-top" id="toTop" aria-hidden="true">
+    <button type="button" aria-label="Voltar ao topo" tabindex="-1">
+      <span class="arrow-up" aria-hidden="true"></span>
+    </button>
+  </div>
+
+  <script>
+    /* ===========================
+       i18n (PT/ES) + UI behavior
+    ============================ */
+    const i18n = {
+      pt: {
+        skip: "Pular para o conteúdo",
+        topbar_tagline: "UFRJ/ECO - UdG",
+        nav_about: "Sobre",
+        nav_questions: "Perguntas",
+        nav_method: "Método",
+        nav_findings: "Descobertas",
+        nav_outputs: "Produção",
+        nav_contact: "Contato",
+        nav_repia: "REPIA",
+        nav_join: "Participar",
+        nav_faq: "FAQ",
+
+        badge_institutions: "UFRJ/ECO - UdG",
+        badge_genai: "IA Generativa",
+        badge_ethics: "Ética",
+        badge_training: "Formação",
+        badge_compare: "Brasil × Catalunha",
+
+        hero_title: "PubComTec — Inteligência Artificial na Publicidade e Propaganda",
+        hero_subtitle:
+          "Investigamos como a IA generativa está reconfigurando a prática publicitária — do uso real em agências às consequências éticas e curriculares na formação de futuras(os) publicitárias(os).",
+        cta_join: "Entrar na REPIA",
+        cta_explore: "Ver descobertas",
+
+        side_1_title: "O que mapeamos",
+        side_1_desc: "Ferramentas de IA, áreas que mais utilizam e frequência — e como isso altera processos criativos e de gestão.",
+        pill_diag: "Diagnóstico",
+        pill_process: "Processos",
+        pill_impact: "Impactos",
+
+        side_2_title: "Por que importa",
+        side_2_desc: "Quando tecnologia entra no fluxo, mudam autoria, responsabilidade, direitos e a própria noção de criatividade.",
+        pill_ethics: "Ética",
+        pill_authorship: "Autoria",
+        pill_curriculum: "Currículo",
+
+        side_3_title: "Coordenação",
+        side_3_desc: "Coordenadora: Maria Alice de Faria Nogueira.",
+        pill_linkedin: "@pubcomtec",
+
+        kicker_about: "Sobre",
+        about_title: "Tecnologia, publicidade e ética em perspectiva comparada",
+        about_subhead:
+          "O PubComTec é um grupo de pesquisa da ECO-UFRJ em parceria com a Universitat de Girona que investiga o atravessamento das tecnologias digitais — especialmente a IA generativa — na prática publicitária contemporânea e seus efeitos éticos e formativos.",
+        about_card1_title: "Do uso real às consequências",
+        about_card1_desc:
+          "Partimos do mapeamento de ferramentas e rotinas em agências para compreender impactos concretos em processos criativos, decisões estratégicas e perfis profissionais.",
+        about_card2_title: "Formação no centro do debate",
+        about_card2_desc:
+          "Mais do que eficiência técnica, investigamos como a IA reposiciona autoria, responsabilidade, ética e currículo na formação de futuras(os) publicitárias(os).",
+
+        kicker_questions: "Perguntas",
+        questions_title: "Questões que orientam a pesquisa",
+        questions_subhead: "Perguntas que ajudam a compreender transformações reais no mercado e seus reflexos na formação acadêmica.",
+        q1_title: "Criatividade em xeque?",
+        q1_desc: "A IA se torna mais importante que a criatividade humana ou redefine o que entendemos por criação publicitária?",
+        q2_title: "Novas competências",
+        q2_desc: "O publicitário do futuro precisa ser mais técnico? Como equilibrar repertório cultural, método e pensamento crítico?",
+        q3_title: "Responsabilidade e ética",
+        q3_desc: "O que muda em autoria, transparência e responsabilidade quando a IA entra no fluxo de trabalho?",
+
+        kicker_method: "Metodologia",
+        method_title: "Escuta do mercado e análise comparativa",
+        method_subhead: "A pesquisa adota metodologia mista, combinando análise qualitativa e quantitativa em contextos distintos.",
+        m1_title: "Entrevistas",
+        m1_desc: "CEOs, diretores(as) de criação e lideranças de agências de diferentes portes.",
+        m2_title: "Contextos",
+        m2_desc: "Brasil (Rio de Janeiro) e Espanha (Catalunha), permitindo leitura comparada entre mercados.",
+        m3_title: "Análise",
+        m3_desc: "Processos criativos, rotinas de trabalho, ética, regulação e impactos na formação discente.",
+
+        kicker_findings: "Descobertas",
+        findings_title: "O que a pesquisa revela",
+        findings_subhead: "Tendências observadas no uso de IA generativa nas agências e seus principais efeitos.",
+        f1_title: "Uso de IA nas agências",
+        f1_desc: "Adoção crescente e transversal, com maior incidência em criação e produção.",
+        chart_areas: "Áreas mais impactadas",
+        bar_creation: "Criação",
+        bar_production: "Produção",
+
+        f2_title: "Questões éticas",
+        f2_desc: "Diferenças relevantes entre contextos regulatórios e práticas institucionais.",
+        ethics_eu: "Europa",
+        ethics_eu_desc: "Regulação mais estruturada",
+        ethics_br: "Brasil",
+        ethics_br_desc: "Debate em consolidação",
+
+        f3_title: "Formação discente",
+        f3_desc: "Convergência entre domínio técnico e pensamento crítico como eixo central.",
+        pulse_training: "Competência-chave",
+        pulse_training_desc: "crítica + técnica",
+
+        kicker_outputs: "Produção",
+        outputs_title: "Publicações e presença acadêmica",
+        outputs_subhead: "Em 2025, o PubComTec ampliou sua produção e circulação internacional com artigos, capítulos e participação em eventos.",
+        out1_title: "Artigos em periódicos internacionais (Q1) e artigo nacional (A1) em curso",
+        out1_tag1: "Telecommunications Policy (inglês)",
+        out1_tag2: "Revista Latina de Comunicación Social (espanhol)",
+        out1_tag3: "Artigo A1 nacional (no prelo)",
+        out2_title: "Capítulos de livro (espanhol) e novas coletâneas",
+        out2_tag1: "Coletânea da RedPub",
+        out2_tag2: "Novos capítulos em produção",
+        out2_tag3: "“Publicidade sem Fronteiras” (prev.)",
+        out3_title: "Eventos e coletânea internacional (2026)",
+        out3_tag1: "Intercom & Propesq (2025)",
+        out3_tag2: "ICORIA (2025)",
+        out3_tag3: "Advances in Advertising Research (2026)",
+
+        kicker_repia: "REPIA",
+        repia_title: "Uma rede para pensar IA e publicidade em conjunto",
+        repia_subhead: "A REPIA (Rede de Estudos em Publicidade e Inteligência Artificial) reúne pesquisadoras(es) e profissionais para troca contínua de experiências, métodos e agenda de pesquisa.",
+        repia_c1_title: "Troca em rede",
+        repia_c1_desc: "Reuniões, debates e colaboração entre diferentes instituições e regiões.",
+        repia_c2_title: "Interdisciplinaridade",
+        repia_c2_desc: "Comunicação, tecnologia, ética e formação se cruzam em um mesmo espaço.",
+        repia_c3_title: "Impacto coletivo",
+        repia_c3_desc: "Produção científica, articulação institucional e fortalecimento de agenda pública.",
+
+        kicker_join: "Participar",
+        join_title: "Quer contribuir com a comunidade?",
+        join_subhead: "Se você pesquisa (ou quer pesquisar) IA generativa na publicidade — venha trocar referências, métodos e perguntas.",
+        join_c1_title: "Quem pode entrar",
+        join_c1_desc: "Estudantes, docentes, pesquisadoras(es) e profissionais interessados em publicidade, comunicação, tecnologia e ética.",
+        join_p1: "Iniciação científica",
+        join_p2: "Mestrado/Doutorado",
+        join_p3: "Mercado",
+        join_c2_title: "Como começar",
+        join_c2_desc: "Acompanhe o PubComTec no LinkedIn e entre em contato para receber informações sobre reuniões e atividades da REPIA.",
+        cta_back_menu: "Voltar ao menu",
+        cta_faq: "Dúvidas frequentes",
+
+        kicker_faq: "FAQ",
+        faq_title: "Perguntas frequentes",
+        faq_subhead: "Respostas rápidas para quem quer entender a proposta e participar.",
+        faq_q1: "O PubComTec é um grupo de pesquisa formal?",
+        faq_a1: "Sim. O PubComTec é um grupo de pesquisa vinculado à ECO-UFRJ em parceria com a Universitat de Girona e está listado no Diretório de Grupos de Pesquisa do CNPq.",
+        faq_q2: "Qual é o foco do projeto?",
+        faq_a2: "Investigar ferramentas de IA generativa usadas em agências, por quais áreas, com que frequência e quais consequências isso traz para ética, processos e formação discente.",
+        faq_q3: "Como acompanho as novidades?",
+        faq_a3: "Pelo LinkedIn do projeto (@pubcomtec) e pelas comunicações da REPIA sobre reuniões e atividades.",
+
+        footer_tagline: "UFRJ/ECO - UdG • Pesquisa em comunicação, tecnologia e ética",
+        footer_fine: "Grupo de pesquisa sobre Inteligência Artificial na Publicidade e Propaganda. Coordenação: Maria Alice de Faria Nogueira.",
+        link_top: "Topo",
+        link_about: "Sobre",
+        link_repia: "REPIA",
+        link_cnpq: "Diretório CNPq",
+        link_linkedin: "LinkedIn @pubcomtec",
+        footer_note: "Dica: você pode substituir os links “CNPq” e “LinkedIn” pelos URLs oficiais quando quiser."
+      },
+
+      es: {
+        skip: "Saltar al contenido",
+        topbar_tagline: "UFRJ/ECO - UdG",
+        nav_about: "Sobre",
+        nav_questions: "Preguntas",
+        nav_method: "Método",
+        nav_findings: "Hallazgos",
+        nav_outputs: "Producción",
+        nav_contact: "Contacto",
+        nav_repia: "REPIA",
+        nav_join: "Participar",
+        nav_faq: "FAQ",
+
+        badge_institutions: "UFRJ/ECO - UdG",
+        badge_genai: "IA Generativa",
+        badge_ethics: "Ética",
+        badge_training: "Formación",
+        badge_compare: "Brasil × Cataluña",
+
+        hero_title: "PubComTec — Inteligencia Artificial en Publicidad y Propaganda",
+        hero_subtitle:
+          "Investigamos cómo la IA generativa está reconfigurando la práctica publicitaria — desde el uso real en agencias hasta las consecuencias éticas y curriculares en la formación de futuras(os) profesionales.",
+        cta_join: "Entrar en la REPIA",
+        cta_explore: "Ver hallazgos",
+
+        side_1_title: "Qué mapeamos",
+        side_1_desc: "Herramientas de IA, áreas que más la usan y frecuencia — y cómo cambia procesos creativos y de gestión.",
+        pill_diag: "Diagnóstico",
+        pill_process: "Procesos",
+        pill_impact: "Impactos",
+
+        side_2_title: "Por qué importa",
+        side_2_desc: "Cuando la tecnología entra en el flujo, cambian autoría, responsabilidad, derechos y la propia noción de creatividad.",
+        pill_ethics: "Ética",
+        pill_authorship: "Autoría",
+        pill_curriculum: "Currículo",
+
+        side_3_title: "Coordinación",
+        side_3_desc: "Coordinadora: Maria Alice de Faria Nogueira.",
+        pill_linkedin: "@pubcomtec",
+
+        kicker_about: "Sobre",
+        about_title: "Tecnología, publicidad y ética en perspectiva comparada",
+        about_subhead:
+          "PubComTec es un grupo de investigación de la ECO-UFRJ en alianza con la Universitat de Girona que estudia el impacto de las tecnologías digitales — especialmente la IA generativa — en la práctica publicitaria contemporánea y sus efectos éticos y formativos.",
+        about_card1_title: "Del uso real a las consecuencias",
+        about_card1_desc:
+          "Partimos del mapeo de herramientas y rutinas en agencias para comprender impactos concretos en procesos creativos, decisiones estratégicas y perfiles profesionales.",
+        about_card2_title: "Formación en el centro",
+        about_card2_desc:
+          "Más allá de la eficiencia técnica, analizamos cómo la IA reposiciona autoría, responsabilidad, ética y currículo en la formación.",
+
+        kicker_questions: "Preguntas",
+        questions_title: "Preguntas guía de la investigación",
+        questions_subhead: "Preguntas para comprender cambios reales en el mercado y su reflejo en la formación académica.",
+        q1_title: "¿Creatividad en cuestión?",
+        q1_desc: "¿La IA se vuelve más importante que la creatividad humana o redefine lo que entendemos por creación publicitaria?",
+        q2_title: "Nuevas competencias",
+        q2_desc: "¿El publicista del futuro debe ser más técnico? ¿Cómo equilibrar repertorio cultural, método y pensamiento crítico?",
+        q3_title: "Responsabilidad y ética",
+        q3_desc: "¿Qué cambia en autoría, transparencia y responsabilidad cuando la IA entra en el flujo de trabajo?",
+
+        kicker_method: "Metodología",
+        method_title: "Escucha del mercado y análisis comparativo",
+        method_subhead: "La investigación adopta un enfoque mixto, combinando análisis cualitativo y cuantitativo en distintos contextos.",
+        m1_title: "Entrevistas",
+        m1_desc: "CEOs, dirección creativa y liderazgos de agencias de diferentes tamaños.",
+        m2_title: "Contextos",
+        m2_desc: "Brasil (Río de Janeiro) y España (Cataluña), permitiendo lectura comparada entre mercados.",
+        m3_title: "Análisis",
+        m3_desc: "Procesos creativos, rutinas de trabajo, ética, regulación e impactos en la formación.",
+
+        kicker_findings: "Hallazgos",
+        findings_title: "Qué revela la investigación",
+        findings_subhead: "Tendencias observadas en el uso de IA generativa en agencias y sus principales efectos.",
+        f1_title: "Uso de IA en agencias",
+        f1_desc: "Adopción creciente y transversal, con mayor incidencia en creación y producción.",
+        chart_areas: "Áreas más impactadas",
+        bar_creation: "Creación",
+        bar_production: "Producción",
+
+        f2_title: "Cuestiones éticas",
+        f2_desc: "Diferencias relevantes entre contextos regulatorios y prácticas institucionales.",
+        ethics_eu: "Europa",
+        ethics_eu_desc: "Regulación más estructurada",
+        ethics_br: "Brasil",
+        ethics_br_desc: "Debate en consolidación",
+
+        f3_title: "Formación",
+        f3_desc: "Convergencia entre dominio técnico y pensamiento crítico como eje central.",
+        pulse_training: "Competencia clave",
+        pulse_training_desc: "crítica + técnica",
+
+        kicker_outputs: "Producción",
+        outputs_title: "Publicaciones y presencia académica",
+        outputs_subhead: "En 2025, PubComTec amplió su producción y circulación internacional con artículos, capítulos y participación en eventos.",
+        out1_title: "Artículos en revistas internacionales (Q1) y artículo nacional (A1) en curso",
+        out1_tag1: "Telecommunications Policy (inglés)",
+        out1_tag2: "Revista Latina de Comunicación Social (español)",
+        out1_tag3: "Artículo A1 nacional (en prensa)",
+        out2_title: "Capítulos de libro (español) y nuevas colectáneas",
+        out2_tag1: "Colectánea de RedPub",
+        out2_tag2: "Nuevos capítulos en producción",
+        out2_tag3: "“Publicidad sin Fronteras” (prev.)",
+        out3_title: "Eventos y colectánea internacional (2026)",
+        out3_tag1: "Intercom & Propesq (2025)",
+        out3_tag2: "ICORIA (2025)",
+        out3_tag3: "Advances in Advertising Research (2026)",
+
+        kicker_repia: "REPIA",
+        repia_title: "Una red para pensar IA y publicidad en conjunto",
+        repia_subhead: "REPIA (Red de Estudios en Publicidad e Inteligencia Artificial) reúne a investigadoras(es) y profesionales para intercambio continuo de experiencias, métodos y agenda de investigación.",
+        repia_c1_title: "Intercambio en red",
+        repia_c1_desc: "Reuniones, debates y colaboración entre instituciones y regiones.",
+        repia_c2_title: "Interdisciplinariedad",
+        repia_c2_desc: "Comunicación, tecnología, ética y formación se cruzan en un mismo espacio.",
+        repia_c3_title: "Impacto colectivo",
+        repia_c3_desc: "Producción científica, articulación institucional y fortalecimiento de agenda pública.",
+
+        kicker_join: "Participar",
+        join_title: "¿Quieres contribuir con la comunidad?",
+        join_subhead: "Si investigas (o quieres investigar) IA generativa en publicidad — ven a intercambiar referencias, métodos y preguntas.",
+        join_c1_title: "Quién puede entrar",
+        join_c1_desc: "Estudiantes, docentes, investigadoras(es) y profesionales interesados en publicidad, comunicación, tecnología y ética.",
+        join_p1: "Iniciación científica",
+        join_p2: "Máster/Doctorado",
+        join_p3: "Mercado",
+        join_c2_title: "Cómo empezar",
+        join_c2_desc: "Sigue PubComTec en LinkedIn y ponte en contacto para recibir información sobre reuniones y actividades de REPIA.",
+        cta_back_menu: "Volver al menú",
+        cta_faq: "Preguntas frecuentes",
+
+        kicker_faq: "FAQ",
+        faq_title: "Preguntas frecuentes",
+        faq_subhead: "Respuestas rápidas para entender la propuesta y participar.",
+        faq_q1: "¿PubComTec es un grupo de investigación formal?",
+        faq_a1: "Sí. PubComTec está vinculado a la ECO-UFRJ en alianza con la Universitat de Girona y figura en el Directorio de Grupos de Investigación del CNPq.",
+        faq_q2: "¿Cuál es el foco del proyecto?",
+        faq_a2: "Investigar herramientas de IA generativa usadas en agencias, por qué áreas, con qué frecuencia y qué consecuencias trae para ética, procesos y formación.",
+        faq_q3: "¿Cómo sigo las novedades?",
+        faq_a3: "Por el LinkedIn del proyecto (@pubcomtec) y por las comunicaciones de REPIA sobre reuniones y actividades.",
+
+        footer_tagline: "UFRJ/ECO - UdG • Investigación en comunicación, tecnología y ética",
+        footer_fine: "Grupo de investigación sobre Inteligencia Artificial en Publicidad y Propaganda. Coordinación: Maria Alice de Faria Nogueira.",
+        link_top: "Inicio",
+        link_about: "Sobre",
+        link_repia: "REPIA",
+        link_cnpq: "Directorio CNPq",
+        link_linkedin: "LinkedIn @pubcomtec",
+        footer_note: "Consejo: puedes reemplazar los enlaces “CNPq” y “LinkedIn” por las URLs oficiales cuando quieras."
+      }
+    };
+
+    const state = {
+      lang: "pt",
+      reduceMotion: window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    };
+
+
+    // ===== Mobile menu (celular) + offset de âncoras =====
+    const siteTop = document.querySelector(".site-top");
+    const siteNav = document.getElementById("siteNav");
+    const btnMenu = document.getElementById("btnMenu");
+    const navBackdrop = document.getElementById("navBackdrop");
+
+    function setHeaderH(){
+      if (!siteTop) return;
+      document.documentElement.style.setProperty("--header-h", siteTop.offsetHeight + "px");
+    }
+    setHeaderH();
+    window.addEventListener("resize", setHeaderH, { passive: true });
+
+    function closeMenu(){
+      document.body.classList.remove("menu-open");
+      if (btnMenu) btnMenu.setAttribute("aria-expanded", "false");
+      if (navBackdrop) navBackdrop.setAttribute("aria-hidden", "true");
+    }
+    function openMenu(){
+      document.body.classList.add("menu-open");
+      if (btnMenu) btnMenu.setAttribute("aria-expanded", "true");
+      if (navBackdrop) navBackdrop.setAttribute("aria-hidden", "false");
+    }
+    function toggleMenu(){
+      const willOpen = !document.body.classList.contains("menu-open");
+      willOpen ? openMenu() : closeMenu();
+    }
+
+    if (btnMenu){
+      btnMenu.addEventListener("click", toggleMenu);
+    }
+    if (navBackdrop){
+      navBackdrop.addEventListener("click", closeMenu);
+    }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeMenu();
+    });
+
+    if (siteNav){
+      siteNav.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener("click", closeMenu);
+      });
+    }
+
+    
+
+    /* ===========================
+       Nav: aparência de "botões" + ativo por seção
+    ============================ */
+    const headerLinks = Array.from(document.querySelectorAll('.chip-link[href^="#"], .action-link[href^="#"]'))
+      .filter(a => (a.getAttribute("href") || "").length > 1);
+
+    const linksById = new Map();
+    headerLinks.forEach(a => {
+      const id = a.getAttribute("href").slice(1);
+      if (!linksById.has(id)) linksById.set(id, []);
+      linksById.get(id).push(a);
+    });
+
+    function setActiveLink(id){
+      if (!id) return;
+      linksById.forEach((list, key) => {
+        const on = key === id;
+        list.forEach(a => {
+          a.classList.toggle("is-active", on);
+          if (on) a.setAttribute("aria-current", "page");
+          else a.removeAttribute("aria-current");
+        });
+      });
+    }
+
+    const sectionsToWatch = Array.from(linksById.keys())
+      .map(id => document.getElementById(id))
+      .filter(Boolean);
+
+    if ("IntersectionObserver" in window && sectionsToWatch.length){
+      const io = new IntersectionObserver((entries) => {
+        // Prioriza o item mais visível
+        const visible = entries
+          .filter(e => e.isIntersecting)
+          .sort((a,b) => (b.intersectionRatio || 0) - (a.intersectionRatio || 0))[0];
+        if (visible && visible.target && visible.target.id){
+          setActiveLink(visible.target.id);
+        }
+      }, { rootMargin: "-35% 0px -60% 0px", threshold: [0.12, 0.22, 0.32, 0.45] });
+
+      sectionsToWatch.forEach(sec => io.observe(sec));
+    }
+
+    // Estado inicial
+    if (location.hash && location.hash.length > 1){
+      setActiveLink(location.hash.slice(1));
+    } else {
+      // fallback: ativa o primeiro item do menu
+      const first = sectionsToWatch[0];
+      if (first) setActiveLink(first.id);
+    }
+
+    window.addEventListener("hashchange", () => {
+      if (location.hash && location.hash.length > 1) setActiveLink(location.hash.slice(1));
+    }, { passive:true });
+
+// Ao sair do breakpoint mobile, fecha o menu para evitar estado travado
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 720) closeMenu();
+    }, { passive: true });
+
+
+    function setLang(lang){
+      state.lang = lang;
+      document.documentElement.lang = (lang === "pt") ? "pt-BR" : "es";
+      const dict = i18n[lang];
+
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key]) el.textContent = dict[key];
+      });
+
+      // Buttons state
+      const btnPT = document.getElementById("btnPT");
+      const btnES = document.getElementById("btnES");
+      if (btnPT && btnES){
+        btnPT.setAttribute("aria-pressed", String(lang === "pt"));
+        btnES.setAttribute("aria-pressed", String(lang === "es"));
+      }
+
+      // meta description (opcional)
+      const desc = document.querySelector('meta[name="description"]');
+      if (desc){
+        desc.setAttribute("content",
+          lang === "pt"
+            ? "PubComTec — UFRJ/ECO - UdG. Pesquisa sobre IA generativa na prática publicitária, ética e formação."
+            : "PubComTec — UFRJ/ECO - UdG. Investigación sobre IA generativa en la práctica publicitaria, ética y formación."
+        );
+      }
+    }
+
+    function setupLangToggle(){
+      const btnPT = document.getElementById("btnPT");
+      const btnES = document.getElementById("btnES");
+      if (btnPT) btnPT.addEventListener("click", () => setLang("pt"));
+      if (btnES) btnES.addEventListener("click", () => setLang("es"));
+    }
+
+    // Smooth scroll com offset do header sticky + foco acessível
+    function setupAnchors(){
+      const header = document.querySelector("header.site-top");
+      const getOffset = () => (header ? header.getBoundingClientRect().height : 0) + 10;
+
+      document.querySelectorAll('a[href^="#"]').forEach(a => {
+        const href = a.getAttribute("href");
+        if (!href || href === "#") return;
+
+        a.addEventListener("click", (e) => {
+          const id = href.slice(1);
+          const target = document.getElementById(id);
+          if (!target) return;
+
+          e.preventDefault();
+          const top = target.getBoundingClientRect().top + window.pageYOffset - getOffset();
+          window.scrollTo({ top, behavior: state.reduceMotion ? "auto" : "smooth" });
+
+          // move foco para o destino (melhor para teclado/leitores de tela)
+          target.setAttribute("tabindex", "-1");
+          target.focus({ preventScroll:true });
+          window.setTimeout(() => target.removeAttribute("tabindex"), 900);
+        });
+      });
+    }
+
+    // Reveal on scroll (IntersectionObserver)
+    function setupReveal(){
+      const els = Array.from(document.querySelectorAll(".reveal"));
+      if (!("IntersectionObserver" in window)){
+        els.forEach(el => el.classList.add("in"));
+        return;
+      }
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting){
+            entry.target.classList.add("in");
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+
+      els.forEach(el => io.observe(el));
+    }
+
+    // Spotlight do cursor (global + cards/itens)
+    function setupCursorMagic(){
+      const spot = document.querySelector(".cursor-spotlight");
+      if (!spot) return;
+
+      let raf = null;
+      const onMove = (ev) => {
+        const x = (ev.clientX / window.innerWidth) * 100;
+        const y = (ev.clientY / window.innerHeight) * 100;
+
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+          document.documentElement.style.setProperty("--mx", `${x}%`);
+          document.documentElement.style.setProperty("--my", `${y}%`);
+          raf = null;
+        });
+      };
+
+      // Ativa spotlight ao mover (mais confiável que mouseenter/mouseleave no window)
+      const enableSpot = () => spot.classList.add("on");
+      const disableSpot = () => spot.classList.remove("on");
+      const onMoveWithSpot = (ev) => { enableSpot(); onMove(ev); };
+
+      if (window.PointerEvent){
+        document.addEventListener("pointermove", onMoveWithSpot, { passive:true });
+        document.addEventListener("pointerout", (e) => { if (!e.relatedTarget) disableSpot(); }, { passive:true });
+      } else {
+        document.addEventListener("mousemove", onMoveWithSpot, { passive:true });
+        document.addEventListener("mouseout", (e) => { if (!e.relatedTarget) disableSpot(); }, { passive:true });
+      }
+
+      // Brilho local nos cards
+      const setLocal = (el, ev) => {
+        const r = el.getBoundingClientRect();
+        const hx = ((ev.clientX - r.left) / r.width) * 100;
+        const hy = ((ev.clientY - r.top) / r.height) * 100;
+        el.style.setProperty("--hx", `${hx}%`);
+        el.style.setProperty("--hy", `${hy}%`);
+      };
+
+      const targets = document.querySelectorAll(".card, .hero-card, .item");
+      targets.forEach(el => {
+        el.addEventListener("mousemove", (ev) => setLocal(el, ev), { passive:true });
+      });
+    }
+
+    // Botão voltar ao topo (show/hide + scroll)
+   function setupToTop(){
+  const wrap = document.getElementById("toTop");
+  if (!wrap) return;
+
+  const btn = wrap.querySelector("button");
+  const sentinel = document.getElementById("topSentinel");
+
+  // Garante que o botão esteja "renderizável" mesmo no mobile
+  wrap.style.display = "block";
+
+  const setA11y = (isVisible) => {
+    wrap.setAttribute("aria-hidden", String(!isVisible));
+    if (btn) btn.tabIndex = isVisible ? 0 : -1;
+  };
+
+  const show = () => { wrap.classList.add("show"); setA11y(true); };
+  const hide = () => { wrap.classList.remove("show"); setA11y(false); };
+
+  // Estado inicial (sem scroll): escondido e fora da navegação por teclado
+  hide();
+
+  // ✅ Método mais confiável no mobile: IntersectionObserver
+  if ("IntersectionObserver" in window && sentinel){
+    const io = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      // Se o topo NÃO está visível, então você desceu -> mostrar botão
+      if (!entry.isIntersecting) show();
+      else hide();
+    }, { threshold: 0 });
+
+    io.observe(sentinel);
+
+  } else {
+    // Fallback caso não exista IO (muito raro hoje)
+    const onScroll = () => {
+      const y = window.scrollY || document.documentElement.scrollTop || 0;
+      if (y > 120) show();
+      else hide();
+    };
+    window.addEventListener("scroll", onScroll, { passive:true });
+    onScroll();
+  }
+
+  // Clique para subir
+  btn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: state.reduceMotion ? "auto" : "smooth" });
+
+    const brand = document.querySelector(".brand");
+    if (brand){
+      brand.setAttribute("tabindex","-1");
+      brand.focus({ preventScroll:true });
+      setTimeout(() => brand.removeAttribute("tabindex"), 800);
+    }
+  });
+
+  // Safe-area iOS (pra não ficar embaixo da “home bar”)
+  if (window.CSS?.supports?.("padding: env(safe-area-inset-bottom)")){
+    wrap.style.bottom = "calc(16px + env(safe-area-inset-bottom))";
+    wrap.style.right  = "calc(16px + env(safe-area-inset-right))";
+  }
+}
+
+
+    // Init
+/* ===========================
+   Theme (Dark / Light)
+=========================== */
+function setupThemeToggle(){
+  const btn = document.getElementById("btnTheme");
+  if (!btn) return;
+
+  const icon = btn.querySelector(".theme-icon");
+  const label = btn.querySelector(".theme-label");
+
+  const prefersLight = window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: light)").matches;
+
+  const saved = localStorage.getItem("theme");
+  const initialTheme = saved || (prefersLight ? "light" : "dark");
+
+  setTheme(initialTheme);
+
+  btn.addEventListener("click", () => {
+    const current = document.documentElement.getAttribute("data-theme") || "dark";
+    const next = current === "dark" ? "light" : "dark";
+    setTheme(next);
+  });
+
+  function setTheme(theme){
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+
+    const isLight = theme === "light";
+
+    btn.setAttribute("aria-pressed", String(isLight));
+    icon.textContent = isLight ? "☀️" : "🌙";
+
+    const metaTheme = document.getElementById("metaThemeColor") || document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) metaTheme.setAttribute("content", isLight ? "#ffffff" : "#0b0c10");
+
+    if (label){
+      label.textContent = isLight
+        ? (state.lang === "es" ? "Claro" : "Claro")
+        : (state.lang === "es" ? "Oscuro" : "Escuro");
+    }
+  }
+}
+    (function init(){
+      setupLangToggle();
+      setupThemeToggle();
+      setLang("pt");
+      setupAnchors();
+      setupReveal();
+      setupCursorMagic();
+      setupToTop();
+    })();
+  </script>
+</body>
+</html>
